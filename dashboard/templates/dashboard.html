@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forest Edge | AI Monitor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <style>
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+    .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    .badge-glow { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
+
+  <nav class="glass border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-emerald-600 p-2 rounded-lg">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"></path></svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight leading-none">Forest Edge</h1>
+          <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">AI Node Zero-2W</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-xs font-bold text-emerald-700">LIVE FEED</span>
+        </div>
+        
+        <button onclick="triggerManual()" class="group flex items-center gap-2 bg-slate-900 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-lg shadow-slate-200">
+          <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+          Manual Capture
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto p-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+      <div>
+        <h2 class="text-3xl font-black text-slate-900 italic uppercase">Activity Log</h2>
+        <p class="text-slate-500 font-medium">Real-time classification from edge device</p>
+      </div>
+      <div class="flex gap-8">
+        <div class="text-right">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Events</span>
+          <p class="text-3xl font-black text-slate-900 leading-none" id="event-count">{{ events|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="image-grid">
+      {% for e in events %}
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group relative animate-slide-in">
+        <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
+          <img src="/static/captures/{{ e[2] }}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          
+          <div class="absolute top-3 right-3 glass px-3 py-1.5 rounded-xl border border-white/20 shadow-xl flex items-center gap-2 z-10">
+            <span class="text-[11px] font-black text-slate-800 uppercase tracking-tight">{{ e[3] }}</span>
+            <span class="h-4 w-[1px] bg-slate-300"></span>
+            <span class="text-[11px] font-black text-emerald-600">{{ (e[4]|float * 100) | round | int }}%</span>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-50 flex justify-between items-center">
+          <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>{{ e[1][:19].replace('T', ' ') }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div id="empty-state" class="{% if events|length > 0 %}hidden{% endif %} flex flex-col items-center justify-center py-20 text-slate-400">
+        <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        <p class="font-bold uppercase tracking-widest text-xs">Waiting for first detection...</p>
+    </div>
+  </main>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+  <script>
+    var socket = io();
+
+    function triggerManual() {
+      // Visual feedback on button
+      const btn = event.currentTarget;
+      btn.classList.add('bg-emerald-500');
+      
+      fetch('/trigger', { method: 'POST' })
+        .then(response => {
+          if(response.ok) setTimeout(() => btn.classList.remove('bg-emerald-500'), 500);
+        });
+    }
+
+    function formatTime(isoString) {
+      return isoString.substring(0, 19).replace('T', ' ');
+    }
+
+    function showToast(label, confString) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'glass border border-emerald-100 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-4 toast-enter';
+      
+      const confPercent = Math.round(parseFloat(confString) * 100);
+      
+      toast.innerHTML = `
+        <div class="bg-emerald-500 p-2 rounded-lg shadow-lg badge-glow">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">New Detection</p>
+            <p class="text-sm font-bold text-slate-800 uppercase leading-none italic">${label} <span class="text-emerald-500">— ${confPercent}%</span></p>
+        </div>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all 0.5s ease';
+        setTimeout(() => toast.remove(), 500);
+      }, 5000);
+    }
+
+    socket.on('new_event', function(data) {
+      // Hide empty state
+      document.getElementById('empty-state').classList.add('hidden');
+
+      const cleanTime = formatTime(data.timestamp);
+      const confPercent = Math.round(parseFloat(data.confidence) * 100);
+      
+      let countSpan = document.getElementById('event-count');
+      countSpan.innerText = parseInt(countSpan.innerText) + 1;
+
+      let newCard = document.createElement('div');
+      newCard.className = 'bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group relative animate-slide-in';
+      
+      newCard.innerHTML = `
+        <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
+          <img src="/static/captures/${data.image}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute top-3 right-3 glass px-3 py-1.5 rounded-xl border border-white/20 shadow-xl flex items-center gap-2 z-10">
+            <span class="text-[11px] font-black text-slate-800 uppercase tracking-tight">${data.label}</span>
+            <span class="h-4 w-[1px] bg-slate-300"></span>
+            <span class="text-[11px] font-black text-emerald-600">${confPercent}%</span>
+          </div>
+        </div>
+        <div class="p-4 bg-white border-t border-slate-50 flex justify-between items-center">
+          <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>${cleanTime}</span>
+          </div>
+        </div>
+      `;
+
+      let grid = document.getElementById('image-grid');
+      grid.insertBefore(newCard, grid.firstChild);
+
+      showToast(data.label, data.confidence);
+    });
+  </script>
+</body>
+</html>
