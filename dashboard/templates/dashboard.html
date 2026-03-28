@@ -11,6 +11,83 @@
     .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
     .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
     .badge-glow { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .sort-btn:hover { border-color: #10b981; color: #10b981; }
+    .sort-btn.active {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+    .sort-btn .arrow {
+      font-size: 10px;
+      opacity: 0.5;
+      transition: transform 0.2s;
+    }
+    .sort-btn.active .arrow { opacity: 1; }
+    .sort-btn.asc .arrow  { transform: rotate(180deg); }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .filter-pill:hover { border-color: #6366f1; color: #4338ca; }
+    .filter-pill.active {
+      background: #eef2ff;
+      border-color: #6366f1;
+      color: #3730a3;
+    }
+    .filter-pill .pill-count {
+      background: #e2e8f0;
+      color: #475569;
+      border-radius: 9999px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      transition: all 0.15s;
+    }
+    .filter-pill.active .pill-count {
+      background: #c7d2fe;
+      color: #3730a3;
+    }
+    .filter-pill.all-pill.active {
+      background: #f0fdf4;
+      border-color: #10b981;
+      color: #065f46;
+    }
+    #filter-no-results {
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
@@ -45,7 +122,7 @@
   </nav>
 
   <main class="max-w-7xl mx-auto p-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div>
         <h2 class="text-3xl font-black text-slate-900 italic uppercase">Activity Log</h2>
         <p class="text-slate-500 font-medium">Real-time classification from edge device</p>
@@ -58,9 +135,56 @@
       </div>
     </div>
 
+    <!-- Sort toolbar -->
+    <div class="flex flex-wrap items-center gap-2 mb-8 pb-5 border-b border-slate-200">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-1">Sort by</span>
+      <button class="sort-btn active" id="sort-newest" onclick="setSort('time', 'desc', this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Newest first
+      </button>
+      <button class="sort-btn" id="sort-oldest" onclick="setSort('time', 'asc', this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Oldest first
+      </button>
+      <button class="sort-btn" id="sort-label" onclick="setSort('label', 'asc', this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 7h18M3 12h12M3 17h6"/></svg>
+        Detection A–Z
+        <span class="arrow">↓</span>
+      </button>
+      <button class="sort-btn" id="sort-conf-desc" onclick="setSort('confidence', 'desc', this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Confidence ↑
+      </button>
+      <button class="sort-btn" id="sort-conf-asc" onclick="setSort('confidence', 'asc', this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Confidence ↓
+      </button>
+    </div>
+
+    <!-- Filter toolbar -->
+    <div class="flex flex-wrap items-center gap-2 mb-8 pb-5 border-b border-slate-200">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-1">Filter</span>
+      <div id="filter-pills" class="flex flex-wrap gap-2">
+        <button class="filter-pill all-pill active" onclick="toggleFilter('__all__', this)">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          All
+          <span class="pill-count" id="filter-count-all">{{ events|length }}</span>
+        </button>
+      </div>
+      <span class="text-[10px] font-bold text-slate-300 ml-2" id="filter-status"></span>
+    </div>
+
+    <div id="filter-no-results" class="flex flex-col items-center justify-center py-16 text-slate-400">
+      <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+      <p class="font-bold uppercase tracking-widest text-xs">No detections match this filter</p>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="image-grid">
       {% for e in events %}
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group relative animate-slide-in">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group relative animate-slide-in"
+           data-label="{{ e[3] }}"
+           data-confidence="{{ e[4] }}"
+           data-timestamp="{{ e[1] }}">
         <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
           <img src="/static/captures/{{ e[2] }}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           
@@ -92,14 +216,136 @@
   <script>
     var socket = io();
 
+    // ── State ───────────────────────────────────────────────────
+    var currentSortKey = 'time';
+    var currentSortDir = 'desc';
+    var activeFilters   = new Set(); // empty = show all
+
+    // ── Label registry: label → { count, pillEl } ───────────────
+    var labelRegistry = {};
+
+    function registerLabel(label) {
+      if (labelRegistry[label]) {
+        labelRegistry[label].count++;
+      } else {
+        labelRegistry[label] = { count: 1, pillEl: null };
+        createFilterPill(label);
+      }
+      refreshPillCounts();
+    }
+
+    function createFilterPill(label) {
+      var container = document.getElementById('filter-pills');
+      var pill = document.createElement('button');
+      pill.className = 'filter-pill';
+      pill.setAttribute('onclick', "toggleFilter('" + label.replace(/'/g, "\\'") + "', this)");
+      pill.innerHTML =
+        '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>' +
+        label.toUpperCase() +
+        '<span class="pill-count" id="filter-count-' + label + '">1</span>';
+      container.appendChild(pill);
+      labelRegistry[label].pillEl = pill;
+    }
+
+    function refreshPillCounts() {
+      var total = 0;
+      Object.keys(labelRegistry).forEach(function(label) {
+        var info = labelRegistry[label];
+        total += info.count;
+        var el = document.getElementById('filter-count-' + label);
+        if (el) el.textContent = info.count;
+      });
+      var allCount = document.getElementById('filter-count-all');
+      if (allCount) allCount.textContent = total;
+    }
+
+    // ── Filter logic ────────────────────────────────────────────
+    function toggleFilter(label, btn) {
+      if (label === '__all__') {
+        activeFilters.clear();
+        document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+      } else {
+        document.querySelector('.all-pill').classList.remove('active');
+        if (activeFilters.has(label)) {
+          activeFilters.delete(label);
+          btn.classList.remove('active');
+          if (activeFilters.size === 0) {
+            document.querySelector('.all-pill').classList.add('active');
+          }
+        } else {
+          activeFilters.add(label);
+          btn.classList.add('active');
+        }
+      }
+      applyFilterAndSort();
+    }
+
+    function applyFilterAndSort() {
+      var grid  = document.getElementById('image-grid');
+      var cards = Array.from(grid.querySelectorAll('[data-timestamp]'));
+      var showAll = activeFilters.size === 0;
+
+      var visible = 0;
+      cards.forEach(function(card) {
+        var match = showAll || activeFilters.has(card.dataset.label);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+
+      // Sort the visible ones
+      var visibleCards = cards.filter(function(c) { return c.style.display !== 'none'; });
+      visibleCards.sort(function(a, b) {
+        var av = cardSortValue(a), bv = cardSortValue(b);
+        if (av < bv) return currentSortDir === 'asc' ? -1 :  1;
+        if (av > bv) return currentSortDir === 'asc' ?  1 : -1;
+        return 0;
+      });
+      visibleCards.forEach(function(card) { grid.appendChild(card); });
+
+      // Empty state for filters
+      var noResults = document.getElementById('filter-no-results');
+      var emptyState = document.getElementById('empty-state');
+      if (!showAll && visible === 0) {
+        noResults.style.display = 'flex';
+        noResults.style.flexDirection = 'column';
+        noResults.style.alignItems = 'center';
+      } else {
+        noResults.style.display = 'none';
+      }
+
+      // Status text
+      var total = cards.length;
+      var status = document.getElementById('filter-status');
+      if (!showAll) {
+        status.textContent = 'Showing ' + visible + ' of ' + total;
+      } else {
+        status.textContent = '';
+      }
+    }
+
+    // ── Sort ─────────────────────────────────────────────────────
+    function setSort(key, dir, btn) {
+      currentSortKey = key;
+      currentSortDir = dir;
+      document.querySelectorAll('.sort-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      applyFilterAndSort();
+    }
+
+    function cardSortValue(card) {
+      if (currentSortKey === 'label')      return card.dataset.label.toLowerCase();
+      if (currentSortKey === 'confidence') return parseFloat(card.dataset.confidence);
+      return card.dataset.timestamp;
+    }
+
+    // ── Manual capture ───────────────────────────────────────────
     function triggerManual() {
-      // Visual feedback on button
       const btn = event.currentTarget;
       btn.classList.add('bg-emerald-500');
-      
       fetch('/trigger', { method: 'POST' })
         .then(response => {
-          if(response.ok) setTimeout(() => btn.classList.remove('bg-emerald-500'), 500);
+          if (response.ok) setTimeout(() => btn.classList.remove('bg-emerald-500'), 500);
         });
     }
 
@@ -110,21 +356,18 @@
     function showToast(label, confString) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      toast.className = 'glass border border-emerald-100 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-4 toast-enter';
-      
+      toast.className = 'glass border border-emerald-100 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-4';
       const confPercent = Math.round(parseFloat(confString) * 100);
-      
       toast.innerHTML = `
         <div class="bg-emerald-500 p-2 rounded-lg shadow-lg badge-glow">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
         </div>
         <div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">New Detection</p>
-            <p class="text-sm font-bold text-slate-800 uppercase leading-none italic">${label} <span class="text-emerald-500">— ${confPercent}%</span></p>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">New Detection</p>
+          <p class="text-sm font-bold text-slate-800 uppercase leading-none italic">${label} <span class="text-emerald-500">— ${confPercent}%</span></p>
         </div>
       `;
       container.appendChild(toast);
-      
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(20px)';
@@ -133,19 +376,27 @@
       }, 5000);
     }
 
+    // ── Boot: register labels from server-rendered cards ─────────
+    document.querySelectorAll('[data-label]').forEach(function(card) {
+      registerLabel(card.dataset.label);
+    });
+
+    // ── Live event ───────────────────────────────────────────────
     socket.on('new_event', function(data) {
-      // Hide empty state
       document.getElementById('empty-state').classList.add('hidden');
 
-      const cleanTime = formatTime(data.timestamp);
+      const cleanTime  = formatTime(data.timestamp);
       const confPercent = Math.round(parseFloat(data.confidence) * 100);
-      
+
       let countSpan = document.getElementById('event-count');
       countSpan.innerText = parseInt(countSpan.innerText) + 1;
 
       let newCard = document.createElement('div');
       newCard.className = 'bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group relative animate-slide-in';
-      
+      newCard.dataset.label      = data.label;
+      newCard.dataset.confidence = data.confidence;
+      newCard.dataset.timestamp  = data.timestamp;
+
       newCard.innerHTML = `
         <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
           <img src="/static/captures/${data.image}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -163,9 +414,9 @@
         </div>
       `;
 
-      let grid = document.getElementById('image-grid');
-      grid.insertBefore(newCard, grid.firstChild);
-
+      document.getElementById('image-grid').appendChild(newCard);
+      registerLabel(data.label);   // update pills + counts
+      applyFilterAndSort();        // re-sort & respect active filters
       showToast(data.label, data.confidence);
     });
   </script>
