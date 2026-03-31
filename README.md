@@ -231,7 +231,10 @@ This script is a dataset collection utility for downloading wildlife training im
 ### 6.2 `summarize_run.py`
 This script is a post-run analysis utility for a JSON log produced by the edge pipeline. It loads the run log, identifies the first and last pipeline events, computes average/min/max latency for each pipeline stage, and summarizes CPU and RAM usage from the before/after system snapshots embedded in each event.
 
-## 7. Team Members and Contributions
+## 7. PASO.pptx
+This slide deck includes the testing the team had conducted for the project. It will be used during the face-to-face demo.
+
+## 8. Team Members and Contributions
 
 ### Chia Wenqi
 
@@ -264,10 +267,10 @@ This script is a post-run analysis utility for a JSON log produced by the edge p
 - PPT slides
 - Video recording
 
-## 8. Acknowledgements
+## 9. Acknowledgements
 The team would like to thank Prof. Muhamed Fauzi for his continuous feedback and guidance throughout the development of this project. We would also like to thank Prof. Haja Rowther for suggesting useful tools and modules, and for loaning the equipment used in this project.
 
-## 9. Declaration of Use of Generative AI Tools
+## 10. Declaration of Use of Generative AI Tools
 The team used generative AI tools, including Claude, ChatGPT and Gemini as supporting tools during selected stages of the project.
 
 These tools were used mainly for the following purposes:
