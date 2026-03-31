@@ -186,7 +186,7 @@
            data-confidence="{{ e[4] }}"
            data-timestamp="{{ e[1] }}">
         <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-          <img src="/static/captures/{{ e[2] }}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <img src="{{ url_for('static', filename='captures/' ~ e[2]) }}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           
           <div class="absolute top-3 right-3 glass px-3 py-1.5 rounded-xl border border-white/20 shadow-xl flex items-center gap-2 z-10">
             <span class="text-[11px] font-black text-slate-800 uppercase tracking-tight">{{ e[3] }}</span>
@@ -399,7 +399,7 @@
 
       newCard.innerHTML = `
         <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-          <img src="/static/captures/${data.image}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <img src="/static/captures/${encodeURIComponent(data.image)}" alt="Capture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           <div class="absolute top-3 right-3 glass px-3 py-1.5 rounded-xl border border-white/20 shadow-xl flex items-center gap-2 z-10">
             <span class="text-[11px] font-black text-slate-800 uppercase tracking-tight">${data.label}</span>
             <span class="h-4 w-[1px] bg-slate-300"></span>

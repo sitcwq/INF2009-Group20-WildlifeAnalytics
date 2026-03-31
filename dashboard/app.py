@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for
 from flask_socketio import SocketIO
 import sqlite3, os, datetime
 
@@ -6,7 +6,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 socketio = SocketIO(app, async_mode='eventlet') 
 
-UPLOAD_DIR = "static/captures"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_DIR = os.path.join(BASE_DIR, "static", "captures")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def init_db():
