@@ -14,6 +14,7 @@ This document describes how to run the edge image-capture + classification pipel
 - Power supply:
   - stable 5V supply.
   - via USB to Pi or a separate USB source.
+- Raspberry Pi 5 (other devices can be used also) for dashboard
 
 ### 1.2 Connections
 
@@ -267,7 +268,6 @@ This script is a post-run analysis utility for a JSON log produced by the edge p
 The team would like to thank Prof. Muhamed Fauzi for his continuous feedback and guidance throughout the development of this project. We would also like to thank Prof. Haja Rowther for suggesting useful tools and modules, and for loaning the equipment used in this project.
 
 ## 9. Declaration of Use of Generative AI Tools
-Declaration of Use of Generative AI Tools
 The team used generative AI tools, including Claude, ChatGPT and Gemini as supporting tools during selected stages of the project.
 
 These tools were used mainly for the following purposes:
