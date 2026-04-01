@@ -224,12 +224,16 @@ There are two other files/scripts used extensively in this project:
 
 - `download_inat_sg.py`
 - `summarize_run.py`
+- 'MobileNetV3Small_V5.ipynb`
 
 ### 6.1 `download_inat_sg.py`
 This script is a dataset collection utility for downloading wildlife training images from [iNaturalist](https://www.inaturalist.org/) via the iNat observations API. It targets a fixed set of taxa, prioritizes Singapore first, then nearby fallback place IDs, downloads one photo per observation into class folders, and records everything in a manifest.csv so duplicate observation/photo pairs are not re-downloaded across runs. It also supports filtering to specific labels, selecting photo size, controlling retry behavior, and tuning API pacing.
 
 ### 6.2 `summarize_run.py`
 This script is a post-run analysis utility for a JSON log produced by the edge pipeline. It loads the run log, identifies the first and last pipeline events, computes average/min/max latency for each pipeline stage, and summarizes CPU and RAM usage from the before/after system snapshots embedded in each event.
+
+### 6.3 'MobileNetV3Small_V5.ipynb`
+Colab notebook with cell output for our final model trained using MobileNetV3Small (transfer learning). Quantized to INT8.
 
 ## 7. PASO.pptx (Edge development and optimising document)
 This slide deck includes the testing and optimisation the team had conducted for the project. Used during the face-to-face demo. Includes performances and other sources used to back up optimisation claims.
