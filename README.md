@@ -65,8 +65,8 @@ pip install tflite-runtime
 
 ### 3.1 Files Required
 You need:
-- `model_int8.tflite`
-- `labels.json`
+- `model_int8.tflite`(from V5 model folder)
+- `labels.json` (from V5 model folder)
 - `edge_with_logs_scheduled.py` (pipeline script)
 
 ### 3.2 Copy files from Windows to Pi via SCP
@@ -75,7 +75,7 @@ From Windows Command Prompt (replace `<student@PI_IP>` if needed):
 ```bash
 scp "%USERPROFILE%\Downloads\model_int8.tflite" student@<PI_IP>:~/wildlife_edge/models/
 scp "%USERPROFILE%\Downloads\labels.json" student@<PI_IP>:~/wildlife_edge/models/
-scp "%USERPROFILE%\Downloads\capture_and_classify.py" student@<PI_IP>:~/wildlife_edge/src/
+scp "%USERPROFILE%\Downloads\edge_with_logs_scheduled.py" student@<PI_IP>:~/wildlife_edge/src/
 ```
 
 ## 4. Running the Application
