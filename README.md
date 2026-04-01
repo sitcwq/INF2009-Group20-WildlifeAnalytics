@@ -231,8 +231,8 @@ This script is a dataset collection utility for downloading wildlife training im
 ### 6.2 `summarize_run.py`
 This script is a post-run analysis utility for a JSON log produced by the edge pipeline. It loads the run log, identifies the first and last pipeline events, computes average/min/max latency for each pipeline stage, and summarizes CPU and RAM usage from the before/after system snapshots embedded in each event.
 
-## 7. PASO.pptx
-This slide deck includes the testing the team had conducted for the project. It will be used during the face-to-face demo.
+## 7. PASO.pptx (Edge development and optimising document)
+This slide deck includes the testing and optimisation the team had conducted for the project. Used during the face-to-face demo. Includes performances and other sources used to back up optimisation claims.
 
 ## 8. Team Members and Contributions
 
